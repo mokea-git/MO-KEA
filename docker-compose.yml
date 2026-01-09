@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  mokea-frontend:
+    build:
+      context: .  # Dockerfile이 mokea-app 밖에 있다면 . / 안에 있다면 ./mokea-app
+      dockerfile: Dockerfile
+    container_name: mokea-web
+    expose:
+      - "80"      # Traefik은 내부에서 80으로 통신합니다
+    ports:
+      - "4830:80" # 직접 접속용 포트
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      # HTTP -> HTTPS 리다이렉트 및 라우팅 설정
+      - "traefik.http.routers.mokea-web.rule=Host(`mokea.cloud`) || Host(`www.mokea.cloud`)"
+      - "traefik.http.routers.mokea-web.entrypoints=websecure"
+      - "traefik.http.routers.mokea-web.tls=true"
+      - "traefik.http.routers.mokea-web.tls.certresolver=myresolver" # 사용 중인 certresolver 이름 확인!
+      # 포트 명시 (컨테이너 내부 포트)
+      - "traefik.http.services.mokea-web.loadbalancer.server.port=80"
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true  # 이미 생성되어 있는 Traefik 네트워크 사용
