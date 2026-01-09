@@ -3,7 +3,7 @@ version: '3.8'
 services:
   mokea-frontend:
     build:
-      context: .  # Dockerfile이 mokea-app 밖에 있다면 . / 안에 있다면 ./mokea-app
+      context: ./mokea-app
       dockerfile: Dockerfile
     container_name: mokea-web
     expose:
