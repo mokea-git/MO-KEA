@@ -6,6 +6,10 @@ services:
       context: .             # 현재 위치(루트)를 기준으로 빌드해!
       dockerfile: Dockerfile  # 루트에 있는 Dockerfile을 읽어!
     container_name: mokea-web
+    shm_size: '256m' 
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     expose:
       - "80"
     ports:
