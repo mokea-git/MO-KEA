@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import linenaLogo from '../assets/ICON-MAIN.png'
-import mokeaLogo from '../assets/ICON-MAIN.png'
+import linenaLogo from '../assets/ICON-main.png'
+import mokeaLogo from '../assets/ICON-main.png'
 
 function Linena() {
   const [darkMode] = useState(true)
