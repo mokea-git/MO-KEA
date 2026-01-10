@@ -2,21 +2,29 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 
-# 패키지 설치 (메모리 절약을 위해 ci 사용)
-COPY mokea-app/package*.json ./
-RUN npm ci --quiet
+# 현재 위치에 있는 package 파일을 복사 (mokea-app 폴더 기준)
+COPY package*.json ./
 
-# 소스 복사 및 빌드
-COPY mokea-app/ .
+# 에러 무시 옵션과 최소 설치 옵션 사용
+RUN npm install --no-audit --progress=false
+
+# 전체 소스 복사
+COPY . .
+
+# 빌드 실행
 RUN npm run build
 
-# 2단계: 실행 (Nginx 없이 Node로 직접 서빙)
-# 매우 가벼운 정적 서버인 'serve' 패키지를 사용합니다.
+# 2단계: 실행 (Nginx 없이 가벼운 serve 사용)
+FROM node:20-alpine
+WORKDIR /app
+
+# 빌드 결과물만 복사
+COPY --from=build /app/dist ./dist
+
+# 서빙용 패키지 설치
 RUN npm install -g serve
 
-# Traefik이 바라볼 포트 설정
 EXPOSE 80
 
-# serve 명령어로 dist 폴더를 80포트에서 실행
-# -s 옵션은 SPA(Single Page Application) 라우팅을 지원합니다.
+# SPA 지원 및 80포트 서빙
 CMD ["serve", "-s", "dist", "-l", "80"]
