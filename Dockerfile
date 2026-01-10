@@ -8,4 +8,4 @@ RUN npm install -g serve
 EXPOSE 80
 
 # 현재 디렉토리(/app)의 index.html을 서빙합니다.
-CMD ["serve", "-s", ".", "-l", "80"]
+CMD ["serve", "-s", ".", "-l", "4900"]
