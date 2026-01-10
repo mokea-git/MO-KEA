@@ -1,11 +1,10 @@
 # 1단계: 빌드 (Node.js)
-FROM node:20-alpine AS build
+FROM node:20-slim AS build
 WORKDIR /app
 
 # 현재 폴더(mokea-app)에 있는 파일을 바로 복사합니다.
 COPY package*.json ./
-RUN npm install
-
+RUN npm install --no-audit --progress=false
 # 나머지 소스 전체 복사
 COPY . .
 
