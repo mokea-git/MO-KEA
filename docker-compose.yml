@@ -16,7 +16,7 @@ services:
       - "traefik.http.routers.mokea-web.entrypoints=websecure"
       - "traefik.http.routers.mokea-web.tls=true"
       - "traefik.http.routers.mokea-web.tls.certresolver=myresolver"
-      - "traefik.http.services.mokea-web.loadbalancer.server.port=80"
+      - "traefik.http.services.mokea-web.loadbalancer.server.port=4900"
 
 networks:
   traefik-public:
