@@ -1,30 +1,22 @@
-# 1단계: 빌드 (Node.js)
-FROM node:20-slim AS build
+# 1단계: 빌드
+FROM node:20-alpine AS build
 WORKDIR /app
 
-# 현재 폴더(mokea-app)에 있는 파일을 바로 복사합니다.
-COPY package*.json ./
-RUN npm install --no-audit --progress=false
-# 나머지 소스 전체 복사
-COPY . .
+# 패키지 설치 (메모리 절약을 위해 ci 사용)
+COPY mokea-app/package*.json ./
+RUN npm ci --quiet
 
-# 빌드 실행 (에러 나면 여기서 멈춥니다)
+# 소스 복사 및 빌드
+COPY mokea-app/ .
 RUN npm run build
 
-# 2단계: 실행 (Nginx)
-FROM nginx:stable-alpine
-# Vite는 기본적으로 dist 폴더를 만듭니다.
-COPY --from=build /app/dist /usr/share/nginx/html
+# 2단계: 실행 (Nginx 없이 Node로 직접 서빙)
+# 매우 가벼운 정적 서버인 'serve' 패키지를 사용합니다.
+RUN npm install -g serve
 
-# SPA 라우팅 설정 (Nginx)
-RUN printf "server { \n\
-    listen 80; \n\
-    location / { \n\
-        root /usr/share/nginx/html; \n\
-        index index.html; \n\
-        try_files \$uri \$uri/ /index.html; \n\
-    } \n\
-}" > /etc/nginx/conf.d/default.conf
-
+# Traefik이 바라볼 포트 설정
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+
+# serve 명령어로 dist 폴더를 80포트에서 실행
+# -s 옵션은 SPA(Single Page Application) 라우팅을 지원합니다.
+CMD ["serve", "-s", "dist", "-l", "80"]
