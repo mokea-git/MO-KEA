@@ -1,29 +1,22 @@
 version: '3.8'
 
 services:
-  mokea-frontend:
+  mokea-web:
     build:
-      context: .             # 현재 위치(루트)를 기준으로 빌드해!
-      dockerfile: Dockerfile  # 루트에 있는 Dockerfile을 읽어!
+      context: .
+      dockerfile: Dockerfile
     container_name: mokea-web
-    shm_size: '256m' 
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
-    expose:
-      - "80"
-    ports:
-      - "4830:80"
     restart: always
+    networks:
+      - traefik-public
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mokea-web.rule=Host(`mokea.cloud`)"
+      # http로 들어오면 자동으로 https로 넘기거나, 기본 websecure 사용
+      - "traefik.http.routers.mokea-web.rule=Host(`mokea.cloud`) || Host(`www.mokea.cloud`)"
       - "traefik.http.routers.mokea-web.entrypoints=websecure"
       - "traefik.http.routers.mokea-web.tls=true"
       - "traefik.http.routers.mokea-web.tls.certresolver=myresolver"
       - "traefik.http.services.mokea-web.loadbalancer.server.port=80"
-    networks:
-      - traefik-public
 
 networks:
   traefik-public:

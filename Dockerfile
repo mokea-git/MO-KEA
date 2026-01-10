@@ -2,14 +2,15 @@
 FROM node:20-alpine
 WORKDIR /app
 
-# 로컬에서 빌드해서 올린 dist 폴더를 컨테이너로 복사 (빌드 과정 생략!)
-COPY mokea-app/dist ./dist
+# 현재 경로의 dist 폴더를 컨테이너의 dist 폴더로 복사
+# (Git Repository 루트에 dist 폴더가 바로 있다면 아래처럼 작성)
+COPY ./dist ./dist
 
-# 정적 파일 서빙을 위한 초경량 패키지 설치 (금방 끝납니다)
+# 정적 파일 서빙을 위한 패키지 설치
 RUN npm install -g serve
 
-# Traefik이 연결될 내부 포트
+# Traefik 연결 포트
 EXPOSE 80
 
-# SPA 라우팅 지원 모드로 실행
+# -s 옵션은 SPA 라우팅(새로고침 시 404 방지)을 위해 필수입니다.
 CMD ["serve", "-s", "dist", "-l", "80"]
